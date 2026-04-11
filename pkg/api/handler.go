@@ -5,19 +5,40 @@ import (
 	"net/http"
 )
 
+const (
+	successStatus = "subscribed"
+)
+
 // SubscribeRequest represents the POST /api/v1/subscribe request body
 type SubscribeRequest struct {
 	PRURL string `json:"pr_url"`
 }
 
-// SuccessResponse represents the temporary success response for MS1
-type SuccessResponse struct {
-	Success string `json:"success"`
+// SubscribeResponse represents the success response for POST /api/v1/subscribe
+type SubscribeResponse struct {
+	Status string `json:"status"`
+	PRURL  string `json:"pr_url"`
+}
+
+// ErrorResponse represents an error response from the API
+type ErrorResponse struct {
+	Error   string `json:"error"`
+	Message string `json:"message"`
 }
 
 // HealthResponse represents the health check response
 type HealthResponse struct {
 	Status string `json:"status"`
+}
+
+// writeError writes a consistent error response to the client
+func writeError(w http.ResponseWriter, statusCode int, errorCode, message string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(ErrorResponse{
+		Error:   errorCode,
+		Message: message,
+	})
 }
 
 // HandleHealth handles GET /health requests
@@ -31,19 +52,33 @@ func HandleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 // HandleSubscribe handles POST /api/v1/subscribe requests
+// Validates the request and returns appropriate success or error responses
 func HandleSubscribe(w http.ResponseWriter, r *http.Request) {
 	var req SubscribeRequest
 
-	// Decode the request body
+	// Step 1: Request format validation - decode JSON
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		writeError(w, http.StatusBadRequest, "invalid_request", "request body must be valid JSON")
 		return
 	}
 
-	// For MS1: just return success without any validation or processing
+	// Step 2: Request format validation - check if pr_url is provided
+	if req.PRURL == "" {
+		writeError(w, http.StatusBadRequest, "invalid_request", "pr_url is required")
+		return
+	}
+
+	// Step 3: PR URL format validation
+	if err := ValidatePRURL(req.PRURL); err != nil {
+		writeError(w, http.StatusBadRequest, "invalid_pr_url", err.Error())
+		return
+	}
+
+	// Return success response
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(SuccessResponse{
-		Success: "ok",
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(SubscribeResponse{
+		Status: successStatus,
+		PRURL:  req.PRURL,
 	})
 }
