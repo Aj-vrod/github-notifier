@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Aj-vrod/github-notifier/types"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -8,23 +9,16 @@ import (
 	"strings"
 )
 
-// PRInfo holds the parsed components of a GitHub PR URL
-type PRInfo struct {
-	Owner  string
-	Repo   string
-	Number int
-}
-
 // Validation error messages as constants for consistency
 const (
-	errProtocolNotHTTPS       = "pr_url must use https protocol"
-	errDomainNotGitHub        = "pr_url must be from github.com domain"
-	errInvalidPathFormat      = "pr_url must match format: https://github.com/{owner}/{repo}/pull/{number}"
-	errOwnerInvalidFormat     = "owner must contain only alphanumeric characters and hyphens"
-	errOwnerTooLong           = "owner must not exceed 39 characters"
-	errRepoInvalidFormat      = "repo must contain only alphanumeric characters, hyphens, underscores, and dots"
-	errRepoTooLong            = "repo must not exceed 100 characters"
-	errPRNumberInvalidFormat  = "pull request number must be a positive integer"
+	errProtocolNotHTTPS      = "pr_url must use https protocol"
+	errDomainNotGitHub       = "pr_url must be from github.com domain"
+	errInvalidPathFormat     = "pr_url must match format: https://github.com/{owner}/{repo}/pull/{number}"
+	errOwnerInvalidFormat    = "owner must contain only alphanumeric characters and hyphens"
+	errOwnerTooLong          = "owner must not exceed 39 characters"
+	errRepoInvalidFormat     = "repo must contain only alphanumeric characters, hyphens, underscores, and dots"
+	errRepoTooLong           = "repo must not exceed 100 characters"
+	errPRNumberInvalidFormat = "pull request number must be a positive integer"
 )
 
 // Regular expressions for validation
@@ -37,7 +31,7 @@ var (
 
 // ParsePRURL parses a GitHub PR URL and extracts the owner, repo, and PR number
 // Returns an error if the URL format is invalid
-func ParsePRURL(prURL string) (*PRInfo, error) {
+func ParsePRURL(prURL string) (*types.PRInfo, error) {
 	// Parse the URL
 	u, err := url.Parse(prURL)
 	if err != nil {
@@ -83,7 +77,7 @@ func ParsePRURL(prURL string) (*PRInfo, error) {
 		return nil, err
 	}
 
-	return &PRInfo{
+	return &types.PRInfo{
 		Owner:  owner,
 		Repo:   repo,
 		Number: number,

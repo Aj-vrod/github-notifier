@@ -1,15 +1,14 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 
 	"Aj-vrod/github-notifier/config"
+	"Aj-vrod/github-notifier/internal/storagev0"
+
 	"Aj-vrod/github-notifier/pkg/api"
 	"Aj-vrod/github-notifier/pkg/github"
-
-	"github.com/shurcooL/githubv4"
+	"Aj-vrod/github-notifier/pkg/subscriber"
 )
 
 const (
@@ -18,28 +17,16 @@ const (
 )
 
 func main() {
+	// initiate the poller: NewPoller.Start() in a separate goroutine. Start github client there
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
 	gh := github.NewClient(cfg.GithubCfg)
+	subscriber := subscriber.NewSubscriber(gh)
+	storage := storagev0.NewStorage()
 
-	// Example query to verify GitHub client is working
-	var query struct {
-		Viewer struct {
-			Login     githubv4.String
-			CreatedAt githubv4.DateTime
-		}
-	}
-
-	err = gh.Query(context.Background(), &query, nil)
-	if err != nil {
-		log.Fatalf("failed to execute query: %v", err)
-	}
-	fmt.Println("    Login:", query.Viewer.Login)
-	fmt.Println("CreatedAt:", query.Viewer.CreatedAt)
-
-	server := api.NewServer(ServerPort)
+	server := api.NewServer(ServerPort, subscriber, storage)
 
 	// Start the server
 	log.Fatal(server.Start())

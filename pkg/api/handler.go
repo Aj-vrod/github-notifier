@@ -1,6 +1,8 @@
 package api
 
 import (
+	"Aj-vrod/github-notifier/internal/storagev0"
+	"Aj-vrod/github-notifier/pkg/subscriber"
 	"encoding/json"
 	"net/http"
 )
@@ -53,7 +55,7 @@ func HandleHealth(w http.ResponseWriter, r *http.Request) {
 
 // HandleSubscribe handles POST /api/v1/subscribe requests
 // Validates the request and returns appropriate success or error responses
-func HandleSubscribe(w http.ResponseWriter, r *http.Request) {
+func HandleSubscribe(w http.ResponseWriter, r *http.Request, subscriber *subscriber.Subscriber, storage *storagev0.Storage) {
 	var req SubscribeRequest
 
 	// Step 1: Request format validation - decode JSON
@@ -73,6 +75,21 @@ func HandleSubscribe(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusBadRequest, "invalid_pr_url", err.Error())
 		return
 	}
+
+	// Step 4: Check if the PR exists on GitHub using the GitHub client
+	prInfo, err := ParsePRURL(req.PRURL) // This will extract owner, repo, and PR number
+	if err != nil {
+		writeError(w, http.StatusBadRequest, "invalid_pr_url", err.Error())
+		return
+	}
+	prState, err := subscriber.CheckPRState(r.Context(), *prInfo)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "github_error", "failed to check PR state on GitHub")
+		return
+	}
+
+	// Step 5: Store the subscription in memory
+	storage.AddSubscription(req.PRURL, prState)
 
 	// Return success response
 	w.Header().Set("Content-Type", "application/json")
