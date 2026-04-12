@@ -78,6 +78,7 @@ func ParsePRURL(prURL string) (*types.PRInfo, error) {
 	}
 
 	return &types.PRInfo{
+		URL:    prURL,
 		Owner:  owner,
 		Repo:   repo,
 		Number: number,

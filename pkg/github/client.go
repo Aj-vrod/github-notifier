@@ -1,9 +1,10 @@
 package github
 
 import (
+	"Aj-vrod/github-notifier/types"
 	"context"
+	"errors"
 	"log"
-	"time"
 
 	"github.com/shurcooL/githubv4"
 	"golang.org/x/oauth2"
@@ -27,39 +28,26 @@ func NewClient(cfg GithubConfig) *GithubClient {
 	return &GithubClient{client: client}
 }
 
-func (c *GithubClient) GetPRState(ctx context.Context, owner, repo string, prNumber int) (any, error) {
+func (c *GithubClient) GetPRState(ctx context.Context, prInfo *types.PRInfo) (types.PRQuery, error) {
+	log.Printf("Getting state for PR with reference %s/%s#%d\n", prInfo.Owner, prInfo.Repo, prInfo.Number)
 	variables := map[string]interface{}{
-		"owner":    githubv4.String(owner),
-		"repo":     githubv4.String(repo),
-		"prNumber": githubv4.Int(prNumber),
+		"owner":    githubv4.String(prInfo.Owner),
+		"repo":     githubv4.String(prInfo.Repo),
+		"prNumber": githubv4.Int(prInfo.Number),
 	}
-	var query struct {
-		Repository struct {
-			PullRequest struct {
-				Comments struct {
-					Nodes []struct {
-						Body   string
-						Author struct {
-							Login string
-						}
-						CreatedAt time.Time
-					}
-				} `graphql:"comments(first: 100)"`
-				Commits struct {
-					Nodes []struct {
-						Commit struct {
-							Message string
-						}
-					}
-				} `graphql:"commits(first: 100)"`
-			} `graphql:"pullRequest(number: $prNumber)"`
-		} `graphql:"repository(owner: $owner, name: $repo)"`
-	}
+	var query types.PRQuery
 
 	err := c.client.Query(ctx, &query, variables)
 	if err != nil {
 		log.Fatalf("failed to execute query: %v", err)
 	}
+
+	// Check if the PR exists by verifying if the commits field is nil (GitHub returns null for non-existent PRs)
+	if query.Repository.PullRequest.Commits.Nodes == nil {
+		return types.PRQuery{}, errors.New("PR does not exists")
+	}
+
+	log.Println("PR state was successfully found")
 
 	return query, nil
 }

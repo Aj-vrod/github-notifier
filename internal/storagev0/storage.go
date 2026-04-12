@@ -2,7 +2,7 @@ package storagev0
 
 import (
 	"Aj-vrod/github-notifier/types"
-	"fmt"
+	"log"
 )
 
 type Storage struct {
@@ -15,9 +15,12 @@ func NewStorage() *Storage {
 	}
 }
 
-func (s *Storage) AddSubscription(prURL string, prState types.PRState) {
-	s.registry[prURL] = prState
+func (s *Storage) AddSubscription(prInfo *types.PRInfo, prState types.PRState) {
+	log.Printf("Subscribing new PR URL: %s", prInfo.URL)
+	s.registry[prInfo.URL] = prState
 
-	// for testing
-	fmt.Println(">>>", s.registry)
+}
+
+func (s *Storage) GetAllSubscriptions() types.Registry {
+	return s.registry
 }

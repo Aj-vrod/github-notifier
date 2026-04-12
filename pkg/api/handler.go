@@ -82,14 +82,11 @@ func HandleSubscribe(w http.ResponseWriter, r *http.Request, subscriber *subscri
 		writeError(w, http.StatusBadRequest, "invalid_pr_url", err.Error())
 		return
 	}
-	prState, err := subscriber.CheckPRState(r.Context(), *prInfo)
+	err = subscriber.Subscribe(r.Context(), prInfo)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "github_error", "failed to check PR state on GitHub")
 		return
 	}
-
-	// Step 5: Store the subscription in memory
-	storage.AddSubscription(req.PRURL, prState)
 
 	// Return success response
 	w.Header().Set("Content-Type", "application/json")

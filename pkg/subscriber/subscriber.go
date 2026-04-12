@@ -1,34 +1,42 @@
 package subscriber
 
 import (
+	"Aj-vrod/github-notifier/internal/storagev0"
 	"Aj-vrod/github-notifier/pkg/github"
 	"Aj-vrod/github-notifier/types"
 	"context"
-	"fmt"
+	"log"
 )
 
 type Subscriber struct {
 	ghClient *github.GithubClient
+	storage  *storagev0.Storage
 }
 
-func NewSubscriber(ghClient *github.GithubClient) *Subscriber {
+func NewSubscriber(ghClient *github.GithubClient, storage *storagev0.Storage) *Subscriber {
 	return &Subscriber{
 		ghClient: ghClient,
+		storage:  storage,
 	}
 }
 
-func (s *Subscriber) CheckPRState(ctx context.Context, prInfo types.PRInfo) (types.PRState, error) {
-	ghState, err := s.ghClient.GetPRState(ctx, prInfo.Owner, prInfo.Repo, prInfo.Number)
+func (s *Subscriber) Subscribe(ctx context.Context, prInfo *types.PRInfo) error {
+	log.Println("Starting subscriber checker")
+	var prState types.PRState
+	ghState, err := s.ghClient.GetPRState(ctx, prInfo)
 	if err != nil {
-		return types.PRState{}, err
+		return err
 	}
+	prState = TranslateQueryIntoState(ghState)
 
-	// Temporally print the GitHub PR state for debugging purposes
-	fmt.Println("GitHub PR State:", ghState)
+	s.storage.AddSubscription(prInfo, prState)
+	return nil
+}
 
+func TranslateQueryIntoState(prQuery types.PRQuery) types.PRState {
 	return types.PRState{
-		Exists:   true,
-		Comments: "ghState.Repository.PullRequest.Comments.Nodes,",
-		Commits:  "ghState.Repository.PullRequest.Commits.Nodes",
-	}, nil
+		Body:     prQuery.Repository.PullRequest.Body,
+		Comments: prQuery.Repository.PullRequest.Comments.Nodes,
+		Commits:  prQuery.Repository.PullRequest.Commits.Nodes,
+	}
 }

@@ -1,6 +1,7 @@
 package config
 
 import (
+	"Aj-vrod/github-notifier/internal/poller"
 	"Aj-vrod/github-notifier/pkg/github"
 	"log"
 
@@ -10,6 +11,7 @@ import (
 
 type Config struct {
 	GithubCfg github.GithubConfig
+	PollerCfg poller.Config
 }
 
 func LoadConfig() (*Config, error) {
