@@ -21,11 +21,11 @@ type Config struct {
 type Poller struct {
 	Storage  *storagev0.Storage
 	Config   *Config
-	GHClient *github.GithubClient
-	notifier *slack.SlackClient
+	GHClient github.GitHubClientInterface
+	notifier slack.SlackClientInterface
 }
 
-func NewPoller(storage *storagev0.Storage, cfg *Config, ghClient *github.GithubClient, notifier *slack.SlackClient) *Poller {
+func NewPoller(storage *storagev0.Storage, cfg *Config, ghClient github.GitHubClientInterface, notifier slack.SlackClientInterface) *Poller {
 	if cfg.PollInterval == 0 {
 		cfg.PollInterval = defaultPollInterval
 	}

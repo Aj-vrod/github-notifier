@@ -10,6 +10,11 @@ import (
 	"time"
 )
 
+// SlackClientInterface defines the interface for Slack client operations
+type SlackClientInterface interface {
+	SendNotification(message string) error
+}
+
 type Config struct {
 	WebhookURL string `envconfig:"SLACK_WEBHOOK_URL" required:"true"`
 }
@@ -19,6 +24,9 @@ type SlackClient struct {
 	httpClient *http.Client
 	cfg        *Config
 }
+
+// Ensure SlackClient implements SlackClientInterface
+var _ SlackClientInterface = (*SlackClient)(nil)
 
 func NewSlackClient(cfg *Config) *SlackClient {
 	return &SlackClient{

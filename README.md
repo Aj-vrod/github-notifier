@@ -13,3 +13,12 @@ With a simple POST REST request, the user can subscribe to a single PR by provid
 6. If changed, sends a message to a given Slack channel
 7. If it didn't change, sleep for 30s
 
+## TODOs
+- [] Refactor client types and tests
+- [] Ignore my own comments and commits
+- [] Add mutex lock for storage
+- [] Add lint and test workflows
+- [] Create Dockerfile
+- [] Add Docker build and deploy workflow
+- [] Add k8s manifests
+- [] Use better logger

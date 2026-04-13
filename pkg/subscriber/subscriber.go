@@ -9,11 +9,11 @@ import (
 )
 
 type Subscriber struct {
-	ghClient *github.GithubClient
+	ghClient github.GitHubClientInterface
 	storage  *storagev0.Storage
 }
 
-func NewSubscriber(ghClient *github.GithubClient, storage *storagev0.Storage) *Subscriber {
+func NewSubscriber(ghClient github.GitHubClientInterface, storage *storagev0.Storage) *Subscriber {
 	return &Subscriber{
 		ghClient: ghClient,
 		storage:  storage,

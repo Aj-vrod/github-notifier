@@ -10,6 +10,11 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// GitHubClientInterface defines the interface for GitHub client operations
+type GitHubClientInterface interface {
+	GetPRState(ctx context.Context, prInfo *types.PRInfo) (types.PRQuery, error)
+}
+
 type GithubConfig struct {
 	Token string `envconfig:"GITHUB_TOKEN" required:"true"`
 }
@@ -17,6 +22,9 @@ type GithubConfig struct {
 type GithubClient struct {
 	client *githubv4.Client
 }
+
+// Ensure GithubClient implements GitHubClientInterface
+var _ GitHubClientInterface = (*GithubClient)(nil)
 
 func NewClient(cfg GithubConfig) *GithubClient {
 	src := oauth2.StaticTokenSource(

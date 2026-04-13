@@ -1,13 +1,44 @@
 package api
 
 import (
+	"Aj-vrod/github-notifier/internal/storagev0"
+	"Aj-vrod/github-notifier/pkg/subscriber"
+	"Aj-vrod/github-notifier/types"
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 )
+
+// mockGitHubClient for testing
+type mockGitHubClient struct{}
+
+func (m *mockGitHubClient) GetPRState(ctx context.Context, prInfo *types.PRInfo) (types.PRQuery, error) {
+	testTime := time.Now()
+	return types.PRQuery{
+		Repository: struct {
+			PullRequest types.PRData `graphql:"pullRequest(number: $prNumber)"`
+		}{
+			PullRequest: types.PRData{
+				Body: "Test PR body",
+				Comments: types.PRComments{
+					Nodes: []types.Comment{
+						{Body: "Test comment", Author: types.Author{Login: "user1"}, CreatedAt: testTime},
+					},
+				},
+				Commits: types.PRCommits{
+					Nodes: []types.CommitNode{
+						{Commit: types.Commit{Message: "Test commit"}},
+					},
+				},
+			},
+		},
+	}, nil
+}
 
 // TestHandleHealth tests the GET /health endpoint
 func TestHandleHealth(t *testing.T) {
@@ -66,6 +97,11 @@ func TestHandleSubscribe_Success(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Create test dependencies
+			storage := storagev0.NewStorage()
+			mockGH := &mockGitHubClient{}
+			sub := subscriber.NewSubscriber(mockGH, storage)
+
 			// Create test request
 			req := httptest.NewRequest(
 				http.MethodPost,
@@ -76,7 +112,7 @@ func TestHandleSubscribe_Success(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			// Call the handler
-			HandleSubscribe(w, req)
+			HandleSubscribe(w, req, sub, storage)
 
 			// Check status code
 			if w.Code != http.StatusCreated {
@@ -128,6 +164,11 @@ func TestHandleSubscribe_InvalidJSON(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Create test dependencies
+			storage := storagev0.NewStorage()
+			mockGH := &mockGitHubClient{}
+			sub := subscriber.NewSubscriber(mockGH, storage)
+
 			req := httptest.NewRequest(
 				http.MethodPost,
 				"/api/v1/subscribe",
@@ -136,7 +177,7 @@ func TestHandleSubscribe_InvalidJSON(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			w := httptest.NewRecorder()
 
-			HandleSubscribe(w, req)
+			HandleSubscribe(w, req, sub, storage)
 
 			// Check status code
 			if w.Code != http.StatusBadRequest {
@@ -178,6 +219,11 @@ func TestHandleSubscribe_MissingPRURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Create test dependencies
+			storage := storagev0.NewStorage()
+			mockGH := &mockGitHubClient{}
+			sub := subscriber.NewSubscriber(mockGH, storage)
+
 			req := httptest.NewRequest(
 				http.MethodPost,
 				"/api/v1/subscribe",
@@ -186,7 +232,7 @@ func TestHandleSubscribe_MissingPRURL(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			w := httptest.NewRecorder()
 
-			HandleSubscribe(w, req)
+			HandleSubscribe(w, req, sub, storage)
 
 			// Check status code
 			if w.Code != http.StatusBadRequest {
@@ -266,6 +312,11 @@ func TestHandleSubscribe_InvalidPRURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Create test dependencies
+			storage := storagev0.NewStorage()
+			mockGH := &mockGitHubClient{}
+			sub := subscriber.NewSubscriber(mockGH, storage)
+
 			req := httptest.NewRequest(
 				http.MethodPost,
 				"/api/v1/subscribe",
@@ -274,7 +325,7 @@ func TestHandleSubscribe_InvalidPRURL(t *testing.T) {
 			req.Header.Set("Content-Type", "application/json")
 			w := httptest.NewRecorder()
 
-			HandleSubscribe(w, req)
+			HandleSubscribe(w, req, sub, storage)
 
 			// Check status code
 			if w.Code != http.StatusBadRequest {
@@ -300,7 +351,10 @@ func TestHandleSubscribe_InvalidPRURL(t *testing.T) {
 
 // TestServerRoutes tests that the server routes are properly configured
 func TestServerRoutes(t *testing.T) {
-	server := NewServer(8001)
+	storage := storagev0.NewStorage()
+	mockGH := &mockGitHubClient{}
+	sub := subscriber.NewSubscriber(mockGH, storage)
+	server := NewServer(8001, sub, storage)
 	router := server.GetRouter()
 
 	tests := []struct {
