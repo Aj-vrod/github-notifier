@@ -10,4 +10,8 @@ require (
 	golang.org/x/oauth2 v0.36.0
 )
 
-require github.com/shurcooL/graphql v0.0.0-20240915155400-7ee5256398cf // indirect
+require (
+	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/shurcooL/graphql v0.0.0-20240915155400-7ee5256398cf // indirect
+	github.com/slack-go/slack v0.22.0 // indirect
+)

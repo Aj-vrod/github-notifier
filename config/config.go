@@ -3,6 +3,7 @@ package config
 import (
 	"Aj-vrod/github-notifier/internal/poller"
 	"Aj-vrod/github-notifier/pkg/github"
+	"Aj-vrod/github-notifier/pkg/slack"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -12,6 +13,7 @@ import (
 type Config struct {
 	GithubCfg github.GithubConfig
 	PollerCfg poller.Config
+	SlackCfg  slack.Config
 }
 
 func LoadConfig() (*Config, error) {

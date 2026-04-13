@@ -10,6 +10,7 @@ import (
 
 	"Aj-vrod/github-notifier/pkg/api"
 	"Aj-vrod/github-notifier/pkg/github"
+	"Aj-vrod/github-notifier/pkg/slack"
 	"Aj-vrod/github-notifier/pkg/subscriber"
 )
 
@@ -33,9 +34,11 @@ func main() {
 	storage := storagev0.NewStorage()
 	log.Println("Starting Subscriber")
 	subscriber := subscriber.NewSubscriber(gh, storage)
+	log.Println("Starting Slack Client")
+	notifier := slack.NewSlackClient(&cfg.SlackCfg)
 
 	log.Println("Starting poller")
-	poller := poller.NewPoller(storage, &cfg.PollerCfg, gh)
+	poller := poller.NewPoller(storage, &cfg.PollerCfg, gh, notifier)
 	// Handle graceful shutdown in the
 	pollerShutDown := make(chan error)
 	go poller.Start(ctx, pollerShutDown)

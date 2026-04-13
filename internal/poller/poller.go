@@ -4,6 +4,7 @@ import (
 	"Aj-vrod/github-notifier/internal/storagev0"
 	"Aj-vrod/github-notifier/pkg/api"
 	"Aj-vrod/github-notifier/pkg/github"
+	"Aj-vrod/github-notifier/pkg/slack"
 	"Aj-vrod/github-notifier/pkg/subscriber"
 	"Aj-vrod/github-notifier/types"
 	"context"
@@ -21,9 +22,10 @@ type Poller struct {
 	Storage  *storagev0.Storage
 	Config   *Config
 	GHClient *github.GithubClient
+	notifier *slack.SlackClient
 }
 
-func NewPoller(storage *storagev0.Storage, cfg *Config, ghClient *github.GithubClient) *Poller {
+func NewPoller(storage *storagev0.Storage, cfg *Config, ghClient *github.GithubClient, notifier *slack.SlackClient) *Poller {
 	if cfg.PollInterval == 0 {
 		cfg.PollInterval = defaultPollInterval
 	}
@@ -32,11 +34,12 @@ func NewPoller(storage *storagev0.Storage, cfg *Config, ghClient *github.GithubC
 		Storage:  storage,
 		Config:   cfg,
 		GHClient: ghClient,
+		notifier: notifier,
 	}
 }
 
 func (p *Poller) Start(ctx context.Context, shutdown chan<- error) {
-	log.Println("Starting poller")
+	log.Println("Running poller")
 
 	ticker := time.NewTicker(p.Config.PollInterval)
 	defer ticker.Stop()
@@ -80,8 +83,12 @@ func (p *Poller) checkSubscriptions(ctx context.Context) {
 				Comments: prLatestState.Comments,
 				Commits:  prLatestState.Commits,
 			})
-			// Send notification (this is a placeholder, implement your notification logic here)
-			log.Printf("Notification sent for PR %s", prURL)
+
+			// Send a notification to Slack
+			message := "Changes detected in PR: " + prURL
+			if err := p.notifier.SendNotification(message); err != nil {
+				log.Printf("Error sending notification for PR %s: %v", prURL, err)
+			}
 		} else {
 			log.Printf("No changes detected for PR %s", prURL)
 		}
@@ -136,14 +143,6 @@ func compareComments(oldComments, newComments []types.Comment) bool {
 func compareCommits(oldCommits, newCommits []types.CommitNode) bool {
 	if len(oldCommits) != len(newCommits) {
 		return true
-	}
-
-	for i, oldCommit := range oldCommits {
-		newCommit := newCommits[i]
-		if oldCommit.Commit.Message != newCommit.Commit.Message {
-			log.Printf("Commit message changed from %s to %s", oldCommit.Commit.Message, newCommit.Commit.Message)
-			return true
-		}
 	}
 
 	return false
