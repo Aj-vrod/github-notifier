@@ -54,4 +54,9 @@ type CommitNode struct {
 
 type Commit struct {
 	Message string
+	Author  GitAuthor
+}
+
+type GitAuthor struct {
+	Email string
 }

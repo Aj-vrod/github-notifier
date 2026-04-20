@@ -1,17 +1,17 @@
-package main
+package cmd
 
 import (
-	"context"
-	"log"
-
 	"Aj-vrod/github-notifier/config"
 	"Aj-vrod/github-notifier/internal/poller"
 	"Aj-vrod/github-notifier/internal/storagev0"
-
 	"Aj-vrod/github-notifier/pkg/api"
 	"Aj-vrod/github-notifier/pkg/github"
 	"Aj-vrod/github-notifier/pkg/slack"
 	"Aj-vrod/github-notifier/pkg/subscriber"
+	"context"
+	"log"
+
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -19,7 +19,15 @@ const (
 	ServerPort = 8001
 )
 
-func main() {
+var httpCmd = &cobra.Command{
+	Use:   "http",
+	Short: "Starts the server",
+	Run: func(cmd *cobra.Command, args []string) {
+		httpRun()
+	},
+}
+
+func httpRun() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 

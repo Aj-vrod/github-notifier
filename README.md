@@ -14,11 +14,11 @@ With a simple POST REST request, the user can subscribe to a single PR by provid
 7. If it didn't change, sleep for 30s
 
 ## TODOs
-- [] Refactor client types and tests
-- [] Ignore my own comments and commits
-- [] Add mutex lock for storage
-- [] Add lint and test workflows
-- [] Create Dockerfile
-- [] Add Docker build and deploy workflow
-- [] Add k8s manifests
-- [] Use better logger
+- [ ] Refactor client types and tests
+- [x] Ignore my own comments and commits
+- [ ] Add mutex lock for storage
+- [ ] Add lint and test workflows
+- [x] Create Dockerfile
+- [ ] Add Docker build and deploy workflow
+- [ ] Add k8s manifests
+- [ ] Use better logger

@@ -115,8 +115,12 @@ func comparePRStates(oldState, newState types.PRState) bool {
 }
 
 func compareComments(oldComments, newComments []types.Comment) bool {
-	if len(oldComments) != len(newComments) {
-		return true
+	if len(oldComments) < len(newComments) {
+		if newComments[len(newComments)-1].Author.Login != "Aj-vrod" {
+			log.Println(">>>[DEBUG] ", newComments[len(newComments)-1].Author)
+			log.Println("Coment length changed")
+			return true
+		}
 	}
 
 	for i, oldComment := range oldComments {
@@ -137,13 +141,18 @@ func compareComments(oldComments, newComments []types.Comment) bool {
 		}
 	}
 
+	log.Println("No comment changes")
 	return false
 }
 
 func compareCommits(oldCommits, newCommits []types.CommitNode) bool {
-	if len(oldCommits) != len(newCommits) {
-		return true
+	if len(oldCommits) < len(newCommits) {
+		if newCommits[len(newCommits)-1].Commit.Author.Email != "ammyvrodriguez@hotmail.com" {
+			log.Println("Commit length changed")
+			return true
+		}
 	}
 
+	log.Println("No commit changes")
 	return false
 }
