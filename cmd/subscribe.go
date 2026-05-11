@@ -48,11 +48,27 @@ func validateArgs(args []string) error {
 }
 
 func parseArgs(args []string, reqArgs **types.SubArgs) {
-
+	var org, repo, pr string
+	for _, v := range args {
+		pair := strings.Split(v, "=")
+		switch pair[0] {
+		case "org":
+			org = pair[1]
+		case "repo":
+			repo = pair[1]
+		case "pr":
+			pr = pair[1]
+		}
+	}
+	*reqArgs = &types.SubArgs{
+		Org:  org,
+		Repo: repo,
+		PR:   pr,
+	}
 }
 
 func subscribe(ctx context.Context, args *types.SubArgs) error {
-	payload := `{"pr_url": "https://github.com/Aj-vrod/bicho/pull/18"}`
+	payload := fmt.Sprintf(`{"pr_url": "https://github.com/%s/%s/pull/%s"}`, args.Org, args.Repo, args.PR)
 	r := bytes.NewReader([]byte(payload))
 	requestURL := fmt.Sprintf("http://localhost:%d/api/v1/subscribe", ServerPort)
 	req, err := http.NewRequest(http.MethodPost, requestURL, r)

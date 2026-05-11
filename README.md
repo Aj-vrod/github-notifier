@@ -14,7 +14,7 @@ With a simple POST REST request, the user can subscribe to a single PR by provid
 7. If it didn't change, sleep for 30s
 
 ## TODOs
-- [ ] CLI command for subscribe
+- [x] CLI command for subscribe
 - [ ] /unsubscribe
 - [ ] CLI command for unsubscribe
 - [ ] Refactor client types and tests
