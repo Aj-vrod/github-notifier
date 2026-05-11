@@ -40,7 +40,7 @@ curl -X POST http://localhost:8001/api/v1/subscribe \
 - [ ] Refactor client types and tests
 - [x] Ignore my own comments and commits
 - [x] Include approvals
-- [ ] Add mutex lock for storage
+- [x] Add mutex lock for storage
 - [ ] Add lint and test workflows
 - [x] Create Dockerfile
 - [ ] Add Docker build and deploy workflow
