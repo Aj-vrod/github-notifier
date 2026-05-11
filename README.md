@@ -23,6 +23,8 @@ docker build -t gn .
 docker run \
   -e SLACK_WEBHOOK_URL="MY_SLACK_TOKEN" \
   -e GITHUB_TOKEN="MY_GH_TOKEN" \
+  -e USER_EMAIL="change@me.com" \
+  -e USERNAME="change-me" \
   -p 8001:8001 -d gn:latest
 ```
 3. Subscribe to a PR
@@ -37,7 +39,7 @@ curl -X POST http://localhost:8001/api/v1/subscribe \
 - [x] CLI command for unsubscribe
 - [ ] Refactor client types and tests
 - [x] Ignore my own comments and commits
-- [ ] Include approvals
+- [x] Include approvals
 - [ ] Add mutex lock for storage
 - [ ] Add lint and test workflows
 - [x] Create Dockerfile

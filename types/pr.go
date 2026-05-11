@@ -11,9 +11,10 @@ type PRInfo struct {
 }
 
 type PRState struct {
-	Body     string
-	Comments []Comment
-	Commits  []CommitNode
+	Body           string
+	Comments       []Comment
+	Commits        []CommitNode
+	ReviewDecision string
 }
 
 type Registry map[string]PRState
@@ -25,9 +26,10 @@ type PRQuery struct {
 }
 
 type PRData struct {
-	Comments PRComments `graphql:"comments(first: 100)"`
-	Commits  PRCommits  `graphql:"commits(first: 100)"`
-	Body     string
+	Comments       PRComments `graphql:"comments(first: 100)"`
+	Commits        PRCommits  `graphql:"commits(first: 100)"`
+	Body           string
+	ReviewDecision string
 }
 
 type PRComments struct {

@@ -17,6 +17,8 @@ const defaultPollInterval = 30 * time.Second
 
 type Config struct {
 	PollInterval time.Duration `envconfig:"POLL_INTERVAL" default:"30s"`
+	UserEmail    string        `envconfig:"USER_EMAIL" required:"true"`
+	User         string        `envconfig:"USERNAME" required:"true"`
 }
 
 type Poller struct {
@@ -76,7 +78,7 @@ func (p *Poller) checkSubscriptions(ctx context.Context) {
 		}
 		prLatestState := subscriber.TranslateQueryIntoState(prLatestQuery)
 
-		if comparePRStates(prOldState, prLatestState) {
+		if comparePRStates(prOldState, prLatestState, p.Config) {
 			log.Printf("Changes detected for PR %s/%s #%d, sending notification", prInfo.Owner, prInfo.Repo, prInfo.Number)
 			// Update the stored state with the latest state
 			p.Storage.Subscribe(prInfo, types.PRState{
@@ -99,27 +101,30 @@ func (p *Poller) checkSubscriptions(ctx context.Context) {
 }
 
 // Compare relevant fields to determine if there are changes
-func comparePRStates(oldState, newState types.PRState) bool {
+func comparePRStates(oldState, newState types.PRState, cfg *Config) bool {
 	if oldState.Body != newState.Body {
 		return true
 	}
 
-	if compareComments(oldState.Comments, newState.Comments) {
+	if oldState.ReviewDecision != newState.ReviewDecision {
 		return true
 	}
 
-	if compareCommits(oldState.Commits, newState.Commits) {
+	if compareComments(oldState.Comments, newState.Comments, cfg.User) {
+		return true
+	}
+
+	if compareCommits(oldState.Commits, newState.Commits, cfg.User) {
 		return true
 	}
 
 	return false
 }
 
-func compareComments(oldComments, newComments []types.Comment) bool {
+func compareComments(oldComments, newComments []types.Comment, username string) bool {
 	if len(oldComments) < len(newComments) {
-		if newComments[len(newComments)-1].Author.Login != "Aj-vrod" {
-			log.Println(">>>[DEBUG] ", newComments[len(newComments)-1].Author)
-			log.Println("Coment length changed")
+		if newComments[len(newComments)-1].Author.Login != username {
+			log.Println("List of comments changed")
 			return true
 		}
 	}
@@ -142,18 +147,18 @@ func compareComments(oldComments, newComments []types.Comment) bool {
 		}
 	}
 
-	log.Println("No comment changes")
+	log.Println("No change in comments")
 	return false
 }
 
-func compareCommits(oldCommits, newCommits []types.CommitNode) bool {
+func compareCommits(oldCommits, newCommits []types.CommitNode, userEmail string) bool {
 	if len(oldCommits) < len(newCommits) {
-		if newCommits[len(newCommits)-1].Commit.Author.Email != "ammyvrodriguez@hotmail.com" {
-			log.Println("Commit length changed")
+		if newCommits[len(newCommits)-1].Commit.Author.Email != userEmail {
+			log.Println("List of commits changed")
 			return true
 		}
 	}
 
-	log.Println("No commit changes")
+	log.Println("No change in commits")
 	return false
 }

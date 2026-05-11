@@ -40,8 +40,9 @@ func (s *Subscriber) Unsubscribe(ctx context.Context, prInfo *types.PRInfo) {
 
 func TranslateQueryIntoState(prQuery types.PRQuery) types.PRState {
 	return types.PRState{
-		Body:     prQuery.Repository.PullRequest.Body,
-		Comments: prQuery.Repository.PullRequest.Comments.Nodes,
-		Commits:  prQuery.Repository.PullRequest.Commits.Nodes,
+		Body:           prQuery.Repository.PullRequest.Body,
+		Comments:       prQuery.Repository.PullRequest.Comments.Nodes,
+		Commits:        prQuery.Repository.PullRequest.Commits.Nodes,
+		ReviewDecision: prQuery.Repository.PullRequest.ReviewDecision,
 	}
 }
