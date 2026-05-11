@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"slices"
 	"strings"
@@ -40,7 +41,7 @@ var subscribeCmd = &cobra.Command{
 func validateArgs(args []string) error {
 	for i, v := range validArgs {
 		if slices.IndexFunc(args, func(s string) bool { return v == strings.Split(s, "=")[0] }) == -1 {
-			return fmt.Errorf("Missing %s argument", validArgs[i])
+			return fmt.Errorf("missing %s argument", validArgs[i])
 		}
 	}
 
@@ -73,19 +74,16 @@ func subscribe(ctx context.Context, args *types.SubArgs) error {
 	requestURL := fmt.Sprintf("http://localhost:%d/api/v1/subscribe", ServerPort)
 	req, err := http.NewRequest(http.MethodPost, requestURL, r)
 	if err != nil {
-		fmt.Printf("Could not create request: %s\n", err)
-		return err
+		return fmt.Errorf("could not create request: %s", err)
 	}
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		fmt.Printf("Could not execute the request: %s\n", err)
-		return err
+		return fmt.Errorf("could not execute the request: %s", err)
 	}
 	if res.StatusCode != http.StatusCreated {
-		fmt.Printf("Record was not created: %s\n", err)
-		return err
+		return fmt.Errorf("record was not created: %s", err)
 	}
-	fmt.Println("Record created successfully")
+	log.Println("Record created successfully")
 	return nil
 }

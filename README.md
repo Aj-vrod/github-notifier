@@ -13,12 +13,29 @@ With a simple POST REST request, the user can subscribe to a single PR by provid
 6. If changed, sends a message to a given Slack channel
 7. If it didn't change, sleep for 30s
 
+## Usage (Recommended)
+1. Build the image with Docker
+``` bash
+docker build -t gn .
+```
+2. Run the github-notifier image passing the required environmental variables
+``` bash
+docker run \
+  -e SLACK_WEBHOOK_URL="MY_SLACK_TOKEN" \
+  -e GITHUB_TOKEN="MY_GH_TOKEN" \
+  -p 8001:8001 -d gn:latest
+```
+3. Subscribe to a PR
+``` bash
+curl -X POST http://localhost:8001/api/v1/subscribe \
+-d '{"pr_url": "https://github.com/my-org/my-repo/pull/1"}'
+```
+
 ## TODOs
 - [x] CLI command for subscribe
-- [ ] /unsubscribe
-- [ ] CLI command for unsubscribe
+- [x] /unsubscribe
+- [x] CLI command for unsubscribe
 - [ ] Refactor client types and tests
-- [ ] Create CLI command to subscribe
 - [x] Ignore my own comments and commits
 - [ ] Include approvals
 - [ ] Add mutex lock for storage

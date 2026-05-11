@@ -16,13 +16,13 @@ func NewStorage() *Storage {
 }
 
 func (s *Storage) Subscribe(prInfo *types.PRInfo, prState types.PRState) {
-	log.Printf("Subscribing new PR URL: %s", prInfo.URL)
+	log.Printf("Subscribing new PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
 	s.registry[prInfo.URL] = prState
 
 }
 
 func (s *Storage) Unsubscribe(prInfo *types.PRInfo) {
-	log.Printf("Unsubcribing PR URL: %s", prInfo.URL)
+	log.Printf("Unsubcribing PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
 	delete(s.registry, prInfo.URL)
 }
 

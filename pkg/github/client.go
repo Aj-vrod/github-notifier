@@ -37,7 +37,7 @@ func NewClient(cfg GithubConfig) *GithubClient {
 }
 
 func (c *GithubClient) GetPRState(ctx context.Context, prInfo *types.PRInfo) (types.PRQuery, error) {
-	log.Printf("Getting state for PR with reference %s/%s#%d\n", prInfo.Owner, prInfo.Repo, prInfo.Number)
+	log.Printf("Getting state for PR with reference %s/%s #%d\n", prInfo.Owner, prInfo.Repo, prInfo.Number)
 	variables := map[string]interface{}{
 		"owner":    githubv4.String(prInfo.Owner),
 		"repo":     githubv4.String(prInfo.Repo),

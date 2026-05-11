@@ -34,7 +34,7 @@ func (s *Subscriber) Subscribe(ctx context.Context, prInfo *types.PRInfo) error 
 }
 
 func (s *Subscriber) Unsubscribe(ctx context.Context, prInfo *types.PRInfo) {
-	log.Println("Startung unsubscribe process")
+	log.Println("Starting unsubscribe process")
 	s.storage.Unsubscribe(prInfo)
 }
 

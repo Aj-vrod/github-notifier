@@ -17,6 +17,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	rootCmd.AddCommand(httpCmd)
 	rootCmd.AddCommand(subscribeCmd)
+	rootCmd.AddCommand(unsubscribeCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

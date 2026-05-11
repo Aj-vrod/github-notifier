@@ -8,6 +8,7 @@ import (
 	"Aj-vrod/github-notifier/pkg/subscriber"
 	"Aj-vrod/github-notifier/types"
 	"context"
+	"fmt"
 	"log"
 	"time"
 )
@@ -61,36 +62,36 @@ func (p *Poller) Start(ctx context.Context, shutdown chan<- error) {
 func (p *Poller) checkSubscriptions(ctx context.Context) {
 	subscriptions := p.Storage.GetAllSubscriptions()
 	for prURL, prOldState := range subscriptions {
-		log.Printf("Checking PR: %s", prURL)
+		log.Println("Starting polling...")
 
-		prDetails, err := api.ParsePRURL(prURL)
+		prInfo, err := api.ParsePRURL(prURL)
 		if err != nil {
-			log.Printf("Error parsing PR URL %s: %v", prURL, err)
+			log.Printf("Error parsing PR: %s/%s #%d: %v", prInfo.Owner, prInfo.Repo, prInfo.Number, err)
 			continue
 		}
-		prLatestQuery, err := p.GHClient.GetPRState(ctx, prDetails)
+		prLatestQuery, err := p.GHClient.GetPRState(ctx, prInfo)
 		if err != nil {
-			log.Printf("Error fetching PR info for %s: %v", prURL, err)
+			log.Printf("Error fetching PR: %s/%s #%d: %v", prInfo.Owner, prInfo.Repo, prInfo.Number, err)
 			continue
 		}
 		prLatestState := subscriber.TranslateQueryIntoState(prLatestQuery)
 
 		if comparePRStates(prOldState, prLatestState) {
-			log.Printf("Changes detected for PR %s, sending notification", prURL)
+			log.Printf("Changes detected for PR %s/%s #%d, sending notification", prInfo.Owner, prInfo.Repo, prInfo.Number)
 			// Update the stored state with the latest state
-			p.Storage.Subscribe(prDetails, types.PRState{
+			p.Storage.Subscribe(prInfo, types.PRState{
 				Body:     prLatestState.Body,
 				Comments: prLatestState.Comments,
 				Commits:  prLatestState.Commits,
 			})
 
 			// Send a notification to Slack
-			message := "Changes detected in PR: " + prURL
+			message := fmt.Sprintf("Changes deteced in PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
 			if err := p.notifier.SendNotification(message); err != nil {
-				log.Printf("Error sending notification for PR %s: %v", prURL, err)
+				log.Printf("Error sending notification for PR: %s/%s #%d: %v", prInfo.Owner, prInfo.Repo, prInfo.Number, err)
 			}
 		} else {
-			log.Printf("No changes detected for PR %s", prURL)
+			log.Printf("No changes detected for PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
 		}
 
 	}
