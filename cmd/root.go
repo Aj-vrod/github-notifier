@@ -8,13 +8,15 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "github-notifier",
-	Short: "Notifier of Github events on subscription",
-	Long:  "This service helps you active notifications for PR events by providing the PR URL",
+	Version: "1.0",
+	Use:     "github-notifier",
+	Short:   "Notifier of GitHub events on subscription",
+	Long:    "This service helps you active notifications for GitHub PR events by providing the PR details",
 }
 
 func Execute() {
 	rootCmd.AddCommand(httpCmd)
+	rootCmd.AddCommand(subscribeCmd)
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)

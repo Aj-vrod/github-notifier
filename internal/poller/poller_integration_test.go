@@ -49,7 +49,7 @@ func TestCheckSubscriptions_DetectsBodyChange(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body:     "Old body",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},
@@ -107,7 +107,7 @@ func TestCheckSubscriptions_DetectsCommentChange(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body: "Same body",
 		Comments: []types.Comment{
 			{Body: "Comment 1", Author: types.Author{Login: "user1"}, CreatedAt: testTime},
@@ -159,7 +159,7 @@ func TestCheckSubscriptions_DetectsCommitChange(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body:     "Same body",
 		Comments: []types.Comment{},
 		Commits: []types.CommitNode{
@@ -212,7 +212,7 @@ func TestCheckSubscriptions_NoChanges(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body: "Same body",
 		Comments: []types.Comment{
 			{Body: "Comment 1", Author: types.Author{Login: "user1"}, CreatedAt: testTime},
@@ -275,12 +275,12 @@ func TestCheckSubscriptions_MultipleSubscriptions(t *testing.T) {
 		Number: 2,
 	}
 
-	storage.AddSubscription(prInfo1, types.PRState{
+	storage.Subscribe(prInfo1, types.PRState{
 		Body:     "Body 1",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},
 	})
-	storage.AddSubscription(prInfo2, types.PRState{
+	storage.Subscribe(prInfo2, types.PRState{
 		Body:     "Body 2",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},
@@ -332,7 +332,7 @@ func TestCheckSubscriptions_GithubError(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body:     "Body",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},
@@ -367,7 +367,7 @@ func TestCheckSubscriptions_SlackError(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body:     "Old body",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},
@@ -421,7 +421,7 @@ func TestCheckSubscriptions_InvalidPRURL(t *testing.T) {
 	storage := storagev0.NewStorage()
 
 	// Manually add subscription with invalid URL format (bypassing normal validation)
-	storage.AddSubscription(&types.PRInfo{URL: "invalid-url"}, types.PRState{
+	storage.Subscribe(&types.PRInfo{URL: "invalid-url"}, types.PRState{
 		Body:     "Body",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},
@@ -478,7 +478,7 @@ func TestStart_TickerFires(t *testing.T) {
 		Repo:   "testrepo",
 		Number: 123,
 	}
-	storage.AddSubscription(prInfo, types.PRState{
+	storage.Subscribe(prInfo, types.PRState{
 		Body:     "Body",
 		Comments: []types.Comment{},
 		Commits:  []types.CommitNode{},

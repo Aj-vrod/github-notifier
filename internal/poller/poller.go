@@ -78,7 +78,7 @@ func (p *Poller) checkSubscriptions(ctx context.Context) {
 		if comparePRStates(prOldState, prLatestState) {
 			log.Printf("Changes detected for PR %s, sending notification", prURL)
 			// Update the stored state with the latest state
-			p.Storage.AddSubscription(prDetails, types.PRState{
+			p.Storage.Subscribe(prDetails, types.PRState{
 				Body:     prLatestState.Body,
 				Comments: prLatestState.Comments,
 				Commits:  prLatestState.Commits,

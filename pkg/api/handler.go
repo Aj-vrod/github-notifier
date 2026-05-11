@@ -57,7 +57,6 @@ func HandleHealth(w http.ResponseWriter, r *http.Request) {
 // Validates the request and returns appropriate success or error responses
 func HandleSubscribe(w http.ResponseWriter, r *http.Request, subscriber *subscriber.Subscriber, storage *storagev0.Storage) {
 	var req SubscribeRequest
-
 	// Step 1: Request format validation - decode JSON
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, "invalid_request", "request body must be valid JSON")
@@ -76,23 +75,36 @@ func HandleSubscribe(w http.ResponseWriter, r *http.Request, subscriber *subscri
 		return
 	}
 
-	// Step 4: Check if the PR exists on GitHub using the GitHub client
+	// Step 4: Strip PR information from the URL
 	prInfo, err := ParsePRURL(req.PRURL) // This will extract owner, repo, and PR number
 	if err != nil {
 		writeError(w, http.StatusBadRequest, "invalid_pr_url", err.Error())
 		return
 	}
-	err = subscriber.Subscribe(r.Context(), prInfo)
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, "github_error", "failed to check PR state on GitHub")
+
+	switch r.Method {
+	case "POST":
+		// Step 5: Fetch data from GitHub and subscribe
+		err = subscriber.Subscribe(r.Context(), prInfo)
+		if err != nil {
+			writeError(w, http.StatusInternalServerError, "github_error", "failed to check PR state on GitHub")
+			return
+		}
+
+		// Return success response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(SubscribeResponse{
+			Status: successStatus,
+			PRURL:  req.PRURL,
+		})
+
+	case "DELETE":
+		subscriber.Unsubscribe(r.Context(), prInfo)
+		// Return ok response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
 		return
 	}
 
-	// Return success response
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(SubscribeResponse{
-		Status: successStatus,
-		PRURL:  req.PRURL,
-	})
 }

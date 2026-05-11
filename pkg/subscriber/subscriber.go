@@ -29,8 +29,13 @@ func (s *Subscriber) Subscribe(ctx context.Context, prInfo *types.PRInfo) error 
 	}
 	prState = TranslateQueryIntoState(ghState)
 
-	s.storage.AddSubscription(prInfo, prState)
+	s.storage.Subscribe(prInfo, prState)
 	return nil
+}
+
+func (s *Subscriber) Unsubscribe(ctx context.Context, prInfo *types.PRInfo) {
+	log.Println("Startung unsubscribe process")
+	s.storage.Unsubscribe(prInfo)
 }
 
 func TranslateQueryIntoState(prQuery types.PRQuery) types.PRState {

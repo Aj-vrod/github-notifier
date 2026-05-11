@@ -31,9 +31,10 @@ func NewServer(port int, subscriber *subscriber.Subscriber, storage *storagev0.S
 // setupRoutes configures all HTTP routes for the API
 func (s *Server) setupRoutes(subscriber *subscriber.Subscriber, storage *storagev0.Storage) {
 	s.router.HandleFunc("/health", HandleHealth).Methods("GET")
-	s.router.HandleFunc("/api/v1/subscribe", func(w http.ResponseWriter, r *http.Request) {
+	v1 := s.router.PathPrefix("/api/v1").Subrouter()
+	v1.HandleFunc("/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		HandleSubscribe(w, r, subscriber, storage)
-	}).Methods("POST")
+	}).Methods("POST", "DELETE")
 }
 
 // Start begins listening for HTTP requests on the configured port
