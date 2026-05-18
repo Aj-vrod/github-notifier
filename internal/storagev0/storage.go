@@ -24,6 +24,13 @@ func (s *Storage) Subscribe(prInfo *types.PRInfo, prState types.PRState) {
 	s.Unlock()
 }
 
+func (s *Storage) UpdateState(prInfo *types.PRInfo, prState types.PRState) {
+	log.Printf("Updating state of PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
+	s.Lock()
+	s.registry[prInfo.URL] = prState
+	s.Unlock()
+}
+
 func (s *Storage) Unsubscribe(prInfo *types.PRInfo) {
 	log.Printf("Unsubcribing PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
 	s.Lock()

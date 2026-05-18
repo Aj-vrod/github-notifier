@@ -81,14 +81,14 @@ func (p *Poller) checkSubscriptions(ctx context.Context) {
 		if comparePRStates(prOldState, prLatestState, p.Config) {
 			log.Printf("Changes detected for PR %s/%s #%d, sending notification", prInfo.Owner, prInfo.Repo, prInfo.Number)
 			// Update the stored state with the latest state
-			p.Storage.Subscribe(prInfo, types.PRState{
+			p.Storage.UpdateState(prInfo, types.PRState{
 				Body:     prLatestState.Body,
 				Comments: prLatestState.Comments,
 				Commits:  prLatestState.Commits,
 			})
 
 			// Send a notification to Slack
-			message := fmt.Sprintf("Changes deteced in PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
+			message := fmt.Sprintf("Changes detected in PR: %s/%s #%d", prInfo.Owner, prInfo.Repo, prInfo.Number)
 			if err := p.notifier.SendNotification(message); err != nil {
 				log.Printf("Error sending notification for PR: %s/%s #%d: %v", prInfo.Owner, prInfo.Repo, prInfo.Number, err)
 			}

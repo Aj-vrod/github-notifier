@@ -6,12 +6,12 @@ This service runs in an isolated Docker container in the user's machine. That wa
 
 With a simple POST REST request, the user can subscribe to a single PR by providing the URL in the body and this service will start the check process:
 1. requests to GitHub current state of the PR
-2. stores that state in Redis memory
-3. Sleeps for 30s
+2. stores that state in memory
+3. Sleeps for 60s
 4. requests to Github the latest state of that same PR
 5. Compares latest with previous state
 6. If changed, sends a message to a given Slack channel
-7. If it didn't change, sleep for 30s
+7. If it didn't change, sleep for 60s
 
 ## Usage (Recommended)
 1. Build the image with Docker
