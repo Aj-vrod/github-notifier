@@ -1,6 +1,5 @@
 issuer: https://token.actions.githubusercontent.com
-subject: repo:Aj-vrod/github-notifier:pull_request
-# repo:org/repo:.*
+subject_pattern: repo:org/repo:.*
 
 permissions:
   contents: read
