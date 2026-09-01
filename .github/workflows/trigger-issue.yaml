@@ -12,6 +12,7 @@ jobs:
     if: ${{ github.event.label.name == 'bug' }}
     runs-on: ubuntu-latest
     permissions:
+      contents: write
       id-token: write # Needed to federate tokens.
     steps:
       - name: Grab tmp token
