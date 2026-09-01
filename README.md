@@ -6,7 +6,7 @@ This service runs in an isolated Docker container in the user's machine. That wa
 
 With a simple POST REST request, the user can subscribe to a single PR by providing the URL in the body and this service will start the check process:
 1. Requests to GitHub current state of the PR
-2. stores that state in memory
+2. Stores that state in memory
 3. Sleeps for 60s
 4. Requests to Github the latest state of that same PR
 5. Compares latest with previous state
