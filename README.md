@@ -8,7 +8,7 @@ With a simple POST REST request, the user can subscribe to a single PR by provid
 1. requests to GitHub current state of the PR
 2. stores that state in memory
 3. Sleeps for 60s
-4. requests to Github the latest state of that same PR
+4. Requests to Github the latest state of that same PR
 5. Compares latest with previous state
 6. If changed, sends a message to a given Slack channel
 7. If it didn't change, sleep for 60s
