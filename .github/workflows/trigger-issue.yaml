@@ -2,7 +2,6 @@ name: "Create issue in bicho repository"
 
 on:
   pull_request:
-    branches: master
     types: [ labeled ]
 
 jobs:
