@@ -19,7 +19,7 @@ jobs:
         id: octo-sts
         with:
           scope: Aj-vrod/github-notifier
-          identity: github-notifier-dev
+          identity: dev
 
       - name: Trigger bicho workflow
         run: |
