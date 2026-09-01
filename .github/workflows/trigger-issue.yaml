@@ -21,7 +21,7 @@ jobs:
         id: octo-sts
         with:
           scope: Aj-vrod/bicho
-          identity: dev
+          identity: gn
 
       - name: Trigger bicho workflow
         env:
