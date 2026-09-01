@@ -3,7 +3,7 @@ subject_pattern: repo:Aj-vrod/github-notifier:.*
 
 permissions:
   contents: read
-  workflows: write
+  # workflows: write
 
 # repositories:
 #   - Aj-vrod/github-notifier
