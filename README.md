@@ -5,7 +5,7 @@ Have granular control over what GitHub events you are notified of. No more broad
 This service runs in an isolated Docker container in the user's machine. That way it can use the credentials from the user and all information will never leave their local machine.
 
 With a simple POST REST request, the user can subscribe to a single PR by providing the URL in the body and this service will start the check process:
-1. requests to GitHub current state of the PR
+1. Requests to GitHub current state of the PR
 2. stores that state in memory
 3. Sleeps for 60s
 4. Requests to Github the latest state of that same PR
