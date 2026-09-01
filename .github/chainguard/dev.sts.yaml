@@ -6,6 +6,6 @@ permissions:
   contents: read
   workflows: write
 
-repositories:
-  - Aj-vrod/github-notifier
-  - Aj-vrod/bicho
+# repositories:
+#   - Aj-vrod/github-notifier
+#   - Aj-vrod/bicho
