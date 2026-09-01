@@ -1,5 +1,5 @@
 issuer: https://token.actions.githubusercontent.com
-subject_pattern: "repo:org@Aj-vrod/repo@github-notifier:ref:refs/heads/.*"
+subject: repo:org@<owner-id>/repo@<repo-id>:ref:refs/heads/test/trigger-workflow
 
 
 permissions:
