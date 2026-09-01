@@ -1,6 +1,6 @@
 issuer: https://token.actions.githubusercontent.com
-subject: repo:org@<owner-id>/repo@<repo-id>:ref:refs/heads/test/trigger-workflow
-
+subject: repo:Aj-vrod/github-notifier:pull_request
+# repo:org/repo:.*
 
 permissions:
   contents: read
