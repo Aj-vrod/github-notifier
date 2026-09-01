@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
       id-token: write # Needed to federate tokens.
     steps:
       - name: Grab tmp token
