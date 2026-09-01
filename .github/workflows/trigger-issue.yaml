@@ -22,5 +22,7 @@ jobs:
           identity: dev
 
       - name: Trigger bicho workflow
+        env:
+          GITHUB_TOKEN: ${{ steps.octo-sts.outputs.token }}
         run: |
           gh workflow run "Post an Issue via CI" --repo Aj-vrod/bicho -f title="From github-notifier" -f body="Finally worked"
