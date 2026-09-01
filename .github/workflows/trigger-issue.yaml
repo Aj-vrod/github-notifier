@@ -2,8 +2,10 @@ name: "Create issue in bicho repository"
 
 on:
   pull_request:
-    branches: master
-    types: [ labeled ]
+    branches:
+      - main
+    types:
+      - labeled
 
 jobs:
   trigger:
@@ -17,7 +19,7 @@ jobs:
         id: octo-sts
         with:
           scope: Aj-vrod/github-notifier
-          identity: dev
+          identity: foo
 
       - name: Trigger bicho workflow
         run: |
